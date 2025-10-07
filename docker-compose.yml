@@ -1,0 +1,52 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:14-alpine
+    container_name: forms_db
+    restart: always
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: formsdb
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - backend
+
+  adminer:
+    image: adminer
+    container_name: forms_adminer
+    restart: always
+    ports:
+      - "8080:8080"
+    networks:
+      - backend
+
+  api:
+    build: .
+    container_name: forms_api
+    restart: always
+    ports:
+      - "8000:8000"
+    environment:
+      DATABASE_URL: postgres://root:password@db:5432/formsdb?sslmode=disable
+      ADDR: :8000
+      JWT_ACCESS_SECRET: T+XoJm9xsPH3y52E4u4PjSLbml45Yf+/sAZDMAt7BKw=
+      JWT_REFRESH_SECRET: T+XoJm9xsPH3y52E4u4PjSLbml45Yf+/sAZDMAt7BKw=
+      ACCESS_TOKEN_TTL: 15m
+      REFRESH_TOKEN_TTL: 168h
+      BCRYPT_COST: 12
+      RATE_LIMIT_PER_MIN: 30
+    depends_on:
+      - db
+    networks:
+      - backend
+
+volumes:
+  pgdata:
+
+networks:
+  backend:
