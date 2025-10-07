@@ -35,12 +35,12 @@ func main() {
 		protected.POST("/create", handlers.CreateForm)
 	}
 
-	addr := os.Getenv("ADDR")
-	if addr == "" {
-		addr = ":8000"
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8000"
 	}
 
-	if err := r.Run(addr); err != nil {
+	if err := r.Run(":" + port); err != nil {
 		log.Fatalf("Server failed: %v", err)
 	}
 }
